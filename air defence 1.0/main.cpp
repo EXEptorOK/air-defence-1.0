@@ -132,43 +132,47 @@ public:
 		this->maxDetectDistance = maxDetectDistance;
 		this->breakBetweenStartsS = breakBetweenStartsS;
 		this->readyTimeS = readyTimeS;
+		this->startPoint = { 0,0 };
+		this->targetPoint = { 0,0 };
 		this->equipedMissile = equipedMissile;
 
 		// functional properties
-		this->type = this->selectType(1);
-		this->startPoint = this->setStartPoint();
-		this->targetPoint = this->setTargetPoint();
+		this->type = "ЗРК";
 	}
-	unsigned calculateMoving(unsigned startPoint[2], unsigned targetPoint[2], unsigned short maxOwnSpeed,
-							 unsigned short maxHeight) {
-
+	vector<unsigned> calculateMoving() {
+		return { 0 };
 	}
-	vector<unsigned> setStartPoint() {
+	void setStartPoint() {
 		vector<unsigned> coords = { 0,0 };
-		cout << "Enter start point [x,y]" << endl;
+		system("cls");
+		cout << "Введи координаты пуска [x,y]" << endl;
 		cin >> coords[0];
 		cin >> coords[1];
-		cout << "Data accepted." << endl;
-		return coords;
+		cout << "Данные приняты." << endl;
+		this->startPoint[0] = coords[0];
+		this->startPoint[1] = coords[1];
+		
 	}
-	vector<unsigned> setTargetPoint() {
+	void setTargetPoint() {
 		vector<unsigned> coords = { 0,0 };
-		cout << "Enter target point [x,y]" << endl;
+		system("cls");
+		cout << "Введи координаты цели [x,y]" << endl;
 		cin >> coords[0];
 		cin >> coords[1];
-		cout << "Data accepted." << endl;
-		return coords;
+		cout << "Данные приняты." << endl;
+		this->startPoint[0] = coords[0];
+		this->startPoint[1] = coords[1];
 	}
-	string selectType(byte choice) {
-		switch (choice)
-		{
+	void selectType(byte choice) {
+		switch (choice) {
 		case 1:
-			return "ЗРК";
+			this->type = "ЗРК";
 		case 2:
-			return "ЗРПК";
+			this->type = "ЗРПК";
+		case 3:
+			this->type = "ПЗРК";
 		default:
-			cout << "Введите корректный тип системы ПВО" << endl;
-			return "UNDEFINED!";
+			this->type = "UNDEFINED";
 		}
 	}
 };
@@ -184,8 +188,6 @@ public:
 //AirDefenceSystem Buk{};
 //AirDefenceSystem Tunguska{};
 //AirDefenceSystem Tor{};
-
-//AirDefenceSystem Pac3_Patriot{};
 
 void clearRow() {
 	cout << "\r                                                                                            \r";
@@ -212,13 +214,20 @@ void checkAgreement(uint8_t code) {
 	}
 }
 
+Missile aagm_9M82{ "9M82", "USSR", "anti - aircraft guided missile", 1982, 5800, 150, 5.294f, 9.913f, 1.215f };
+Missile aagm_9M83{ "9M83", "USSR", "anti - aircraft guided missile", 1983, 3500, 150, 3.529f, 7.898f, 0.915f };
+Missile aagm_MIM104A{ "MIM-104A", "USA", "anti - aircraft guided missile", 2001, 700, 91, 3.706f, 5.180f, 0.400f };
+
+
+AirDefenceSystem C300BM_with_aagm_9M82{ "С-300ВМ", "USSR", 1983, 40000, 30000,  48, 16, 4500, 250, 1.5f, 7.5f, aagm_9M82 };
+AirDefenceSystem C300BM_with_aagm_9M83{ "С-300ВМ", "USSR", 1983, 40000, 30000,  48, 16, 4500, 250, 1.5f, 7.5f, aagm_9M83 };
 
 int main() {
 	setlocale(LC_ALL, "rus");
 	system("color 0C");
 	srand(time(0));
 
-	byte missileChoice = NULL;
+	byte systemChoice = NULL;
 	unsigned developerCode = 61027260;
 	unsigned userCode;
 
@@ -236,7 +245,7 @@ int main() {
 		Sleep(600);
 		cout << "Доступ разрешен. Обход проверки..." << endl;
 		Sleep(600);
-		goto simulationStartPoint;
+		//goto simulationStartPoint;
 	}
 	else {
 		cout << "Доступ запрещен." << endl;
@@ -249,8 +258,8 @@ int main() {
 	cout << "                                                                                       " << endl;
 
 	cout << endl << "\nДобро пожаловать в симулятор ПВО Missile-Launcher 0.1 Beta!(версия оффлайн, 2D, одиночная игра)" << endl;
-	cout << "\t1. ВСЕ, ЗДЕСЬ ПРОИСХОДЯЩЕЕ, ЯВЛЯЕТСЯ ВЫДУМАННЫМ, ВСЕ СОВПАДЕНИЯ СЛУЧАЙНЫ!!!\n\t\
-			 2. ЗАПУСКАЯ ДАННОЕ ПО, ВЫ СОГЛАШАЕТЕСЬ СО ВСЕМИ РИСКАМИ И НЕСЕТЕ ЗА СЕБЯ ВСЮ ОТВЕТСВЕННОСТЬ И ПОСЛЕДСТВИЯ В ПОЛНОМ ОБЪЕМЕ!!!\n\t\
+	cout << "1. ВСЕ, ЗДЕСЬ ПРОИСХОДЯЩЕЕ, ЯВЛЯЕТСЯ ВЫДУМАННЫМ, ВСЕ СОВПАДЕНИЯ СЛУЧАЙНЫ!!!\
+			 2. ЗАПУСКАЯ ДАННОЕ ПО, ВЫ СОГЛАШАЕТЕСЬ СО ВСЕМИ РИСКАМИ И НЕСЕТЕ ЗА СЕБЯ ВСЮ ОТВЕТСВЕННОСТЬ И ПОСЛЕДСТВИЯ В ПОЛНОМ ОБЪЕМЕ!!!\
 			 3. НАЖИМАЯ КЛАВИШУ ДЛЯ ПРОДОЛЖЕНИЯ, ВЫ ПРИНИМАЕТЕ ВСЕ ВЫШЕИЗЛОЖЕННЫЕ УСЛОВИЯ, В СЛУЧАЕ ОТКАЗА ОТ СОГЛАШЕНИЯ, НЕМЕДЛЕННО ЗАКРОЙТЕ ДАННОЕ ОКНО!!!" << endl;
 
 	cout << "Вы принимате условия? Y/N:" << endl;
@@ -270,12 +279,12 @@ int main() {
 	cout << "Загрузка успешно завершена!" << endl;
 	Sleep(700);
 
-	cout << "Руководство по горячим клавишам:\n\
-			 1. Жми Ctrl+([+/-]|[MWHEEL]) для изменения масштаба.\n\
-			 2. Жми F1 для запуска симуляции.\n\
-			 3. Жми F2 чтобы управлять паузой.\n\
-			 4. Жми F3+MWHEEL для выбора атакующей ракеты и фокусировки на ней.\n\
-			 5. Жми F4+MWHEEL для выбора оборонительной ракеты и фокусировки на ней.\n\
+	cout << "Руководство по горячим клавишам:\
+			 1. Жми Ctrl+([+/-]|[MWHEEL]) для изменения масштаба.\
+			 2. Жми F1 для запуска симуляции.\
+			 3. Жми F2 чтобы управлять паузой.\
+			 4. Жми F3+MWHEEL для выбора атакующей ракеты и фокусировки на ней\
+			 5. Жми F4+MWHEEL для выбора оборонительной ракеты и фокусировки на ней.\
 			 6. F5 - ТРЕВОГА(РАСЧЁТ ПВО ГОТОВНОСТЬ 1, НЕОБХОДИМ КОД ЗАПУСКА)!!!!!" << endl;
 
 	cout << "Прочитал? Y/N: " << endl;
@@ -284,69 +293,72 @@ int main() {
 			 1. Напиши необходимые числа в целом формате.\n\
 			 2. Для корректного ввода представь окно ПО как координатную плоскость с началом координат в нижнем левом углу.\n\
 			 3. Каждая целая единица является пикселем на экране и равна 200(двумстам) метрам в реальном масштабе для реальной жизни.\n\
-             4. Например, точка (10,2) для программы расположена удалена на 10 пикселей вправо и 2 пикселя вверх от нижнего угла окна программы на экране а в реальной жизни -  на 2000(две тысячи) метров вправо и 400(четыреста) метров соответственно." << endl;
+             4. Например, точка (10,2) для программы расположена удалена на 10 пикселей вправо и 2 пикселя вверх от нижнего угла окна программы на экране а в реальной жизни -  на 400(две тысячи) метров вправо и 80(четыреста) метров соответственно.Итого масштаб: 1 пиксель = 40м" << endl;
 
 	cout << "Готов? Y/N: ";
 	checkAgreement(0);
 	system("pause");
 	system("cls");
-	simulationStartPoint:
+	//simulationStartPoint:
 	cout << "Вариант вражеской системы, выбери один из: \
 			 1 - потенциальный противник - ВСУ, вооруженные ЗРК C-300ВМ с ракетой 9М82,\
 			 2 - потенциальный противник - ВСУ, вооруженные ЗРК С-300ВМ с ракетой 9М83. \
 			 3 - потенциальный противник - ВС США, вооруженные ЗРК PAC-3 \"Patriot\" с ракетой MIM-104A.\
 		     По умолчанию будет выбрано 1" << endl;
+	cin >> systemChoice;
+	AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
+	if (systemChoice == 1) {
+		AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
+	}
+	else if (systemChoice == 2) {
+		AirDefenceSystem enemySystem{ C300BM_with_aagm_9M83 };
+	}
+	else if (systemChoice == 3) {
+		// AirDefenceSystem enemySystem = Pac-3_Patriot;
+	}
+	else {
+		AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
+	}
+	cout << "Загрузка";
+	Sleep(600);
+	clearRow();
+	cout << "Загрузка.";
+	Sleep(600);
+	clearRow();
+	cout << "Загрузка..";
+	Sleep(600);
+	clearRow();
+	cout << "Загрузка..." << endl;
+	Sleep(1000);
+	cout << "" << endl;
+	enemySystem.setStartPoint();
+	enemySystem.setTargetPoint();
+	cout << "Введенные координаты успешно переданы в бортовой компьютер запуска системы. Запомни код пуска: " << enemyLaunchCode << endl;
+	system("pause");
+	clearRow();
+	Sleep(1000);
+	cout << "Итак, необходима защита дружественной инфрастуктуры" << endl;
 
-	switch (missileChoice) {
-	case 1:
-		break;
-	case 2:
-		break;
-	case NULL:
-		break;
+	cout << "Выбери тип системы ПВО:\n\t1 - ЗРК\n\t2 - ЗРПК\n\t3 - ПЗРК" << endl;
+	cout << "Будет выбрана система ПВО на базе ЗРК" << endl;
+	cout << "Тип системы ПВО: \n1. С-300ВМ с ракетой 9М82 \n2. С-300ВМ с ракетой 9М83" << endl;
+	AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
+	cin >> systemChoice;
+	defenceSystem.selectType(systemChoice);
+	if (systemChoice == 1) {
+		AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
+	}
+	else if (systemChoice == 2) {
+		AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M83 };
+	}
+	else {
+		AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
 	}
 
-
-	cout << "Loading";
-	Sleep(600);
-	clearRow();
-	cout << "Loading.";
-	Sleep(600);
-	clearRow();
-	cout << "Loading..";
-	Sleep(600);
-	clearRow();
-	cout << "Loading..." << endl;
-	Sleep(1000);
-	cout << "The target coordinates are given to the attacking missile. YOUR LAUNCH CODE: " << enemyLaunchCode << endl;
-	cout << "Any changes? Y/N: " << endl;
-	system("pause");
-	system("cls");
-	clearRow();
-	cout << "Sure? Y/N: " << endl;
-	checkAgreement(0);
-	system("pause");
-	clearRow();
-	Sleep(1000);
-	cout << "Roger that. So let us try to defend this threat..." << endl;
-
-	cout << "Choose the type of anti-aircraft system:\n\t1 - missile system\n\t2 - machine gun system" << endl;
-	cin >> defenceChoice;
-	cout << "Would be chosen missile system...." << endl;
-	defenceChoice = 1;
+	defenceSystem.setStartPoint();
+	defenceSystem.setTargetPoint();
 
 
-
-	Missile aagm_9M82{ "9M82", "USSR", "anti - aircraft guided missile", 1982, 5800, 150, 5.294f, 9.913f, 1.215f };
-	Missile aagm_9M83{ "9M83", "USSR", "anti - aircraft guided missile", 1983, 3500, 150, 3.529f, 7.898f, 0.915f };
-	Missile aagm_MIM104A{ "MIM-104A", "USA", "anti - aircraft guided missile", 2001, 700, 91, 3.706f, 5.180f, 0.400f };
-
-
-	AirDefenceSystem C300BM_with_aagm_9M82{ "С-300ВМ", "USSR", 1983, 40000, 30000,  48, 16, 4500, 250, 1.5f, 7.5f, aagm_9M82 };
-	AirDefenceSystem C300BM_with_aagm_9M83{ "С-300ВМ", "USSR", 1983, 40000, 30000,  48, 16, 4500, 250, 1.5f, 7.5f, aagm_9M83 };
-
-	AirDefenceSystem enemyADS = C300BM_with_aagm_9M82;
-	AirDefenceSystem defenderADS = C300BM_with_aagm_9M83;
 	Sleep(5000);
 	system("pause");
 	return 0;
