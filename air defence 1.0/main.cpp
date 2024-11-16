@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <string>
 #include <vector>
+#include <valarray>
 
 using namespace std;
 
@@ -90,6 +91,11 @@ public:
 
 	double calculateAirResistanceAcceleration(double missileAirResistancePower, unsigned short missileWholeMass) {
 		return missileAirResistancePower / missileWholeMass;
+	}
+	double missileMovingEquality(double x, byte angleDeg, unsigned short maxSpeedMPS, double airResistancePower, byte activeMotionTime, const double g,unsigned mass) {
+		double yBallistic = ((tan(40.0) * x) - (g + (airResistancePower / mass)) / (2 * maxSpeedMPS * maxSpeedMPS * cos(40.0) * cos(40.0) * x * x) + 7080.948308);
+		return yBallistic;
+		//y=tan(40)𝑥−((9,7056+(22149,7986/4685))/2((1836)^2 )((cos(40))^2 ) ) 𝑥^2+7080,948308	
 	}
 };
 
