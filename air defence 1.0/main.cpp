@@ -14,6 +14,7 @@ byte defenceChoice = 1;
 const double g_middle = 9.7056;
 const double g_ground = 9.8066;
 const double g_50km = 9.6542;
+const double PI = 3.1415926535;
 
 class Missile 
 {
@@ -92,10 +93,15 @@ public:
 	double calculateAirResistanceAcceleration(double missileAirResistancePower, unsigned short missileWholeMass) {
 		return missileAirResistancePower / missileWholeMass;
 	}
-	double missileMovingEquality(double x, byte angleDeg, unsigned short maxSpeedMPS, double airResistancePower, byte activeMotionTime, const double g,unsigned mass) {
-		double yBallistic = ((tan(40.0) * x) - (g + (airResistancePower / mass)) / (2 * maxSpeedMPS * maxSpeedMPS * cos(40.0) * cos(40.0) * x * x) + 7080.948308);
-		return yBallistic;
-		//y=tan(40)𝑥−((9,7056+(22149,7986/4685))/2((1836)^2 )((cos(40))^2 ) ) 𝑥^2+7080,948308	
+	double missileMovingEquality(double x, byte angleDeg, const double g) {
+		double angleRad = angleDeg * (PI / 180);
+		double arg1 = tan(angleRad) * x;
+		double arg2 = g + (this->missileAirResistancePower / this->missileWholeMass);
+		double arg3 = 2 * this->missileSpeedMPS * this->missileSpeedMPS * cos(angleRad) * cos(angleRad);
+		double arg4 = x * x;
+		double arg5 = 7080.948308;
+		double yBallistic = arg1 - ((arg2/arg3)*arg4) + arg5;
+		return yBallistic;	
 	}
 };
 
@@ -384,6 +390,17 @@ int main() {
 
 	defenceSystem.setStartPoint();
 	defenceSystem.setTargetPoint();
+
+	double y;
+	for (long i = 0; i < 250000; i+=1000) {
+		y = aagm_9M82.missileMovingEquality(i, 40, g_middle);
+		if (y <= 0) {
+			clearRow;
+			y = aagm_9M82.missileMovingEquality(244050, 40, g_middle);
+			break;
+		}
+		cout << "(" << i/1000 << " km from start; " << y/1000 << " km above the ground)" << endl;
+	}
 
 
 	Sleep(5000);
