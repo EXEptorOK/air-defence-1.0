@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <valarray>
+#include <gl/freeglut.h>
 
 using namespace std;
 
