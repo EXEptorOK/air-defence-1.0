@@ -1,11 +1,13 @@
-﻿#include <iostream>
+﻿#include "Windows.h"
+#include <iostream>
 #include <math.h>
 #include <cmath>
-#include <windows.h>
 #include <string>
 #include <vector>
 #include <valarray>
 #include <gl/freeglut.h>
+#include <thread>
+#include <future>
 
 using namespace std;
 
@@ -16,6 +18,57 @@ const double g_middle = 9.7056;
 const double g_ground = 9.8066;
 const double g_50km = 9.6542;
 const double PI = 3.1415926535;
+
+int window_x;
+int window_y;
+
+//  variables representing the window size
+int window_width = 480;
+int window_height = 480;
+
+int argc; 
+char** argv;
+
+const char* window_title = "MISSILE LAUNCHER";
+
+void drawObject()
+{
+	//  Draw Icosahedron
+	glutWireIcosahedron();
+}
+
+void centerOnScreen()
+{
+	window_x = (glutGet(GLUT_SCREEN_WIDTH) - window_width) / 2;
+	window_y = (glutGet(GLUT_SCREEN_HEIGHT) - window_height) / 2;
+}
+void init()
+{
+	//  Set the frame buffer clear color to black.
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+}
+
+//-------------------------------------------------------------------------
+//  This function is passed to glutDisplayFunc in order to display
+//  OpenGL contents on the window.
+//-------------------------------------------------------------------------
+void display(void)
+{
+	//  Clear the window or more specifically the frame buffer...
+	//  This happens by replacing all the contents of the frame
+	//  buffer by the clear color (black in our case)
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	//  Draw object
+	drawObject();
+
+	//  Swap contents of backward and forward frame buffers
+	glutSwapBuffers();
+}
+
+//-------------------------------------------------------------------------
+//  Draws our object.
+//-------------------------------------------------------------------------
 
 class Missile 
 {
@@ -256,17 +309,24 @@ Missile aagm_MIM104A{ "MIM-104A", "USA", "anti - aircraft guided missile", 2001,
 AirDefenceSystem C300BM_with_aagm_9M82{ "С-300ВМ", "USSR", 1983, 40000, 30000,  48, 16, 4500, 250, 1.5f, 7.5f, aagm_9M82 };
 AirDefenceSystem C300BM_with_aagm_9M83{ "С-300ВМ", "USSR", 1983, 40000, 30000,  48, 16, 4500, 250, 1.5f, 7.5f, aagm_9M83 };
 
-int main() {
+AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
+AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
+
+byte systemChoice = NULL;
+unsigned developerCode = 61027260;
+unsigned userCode;
+
+unsigned enemyLaunchCode = 23872;
+unsigned defenceLaunchCode = 56897;
+
+double y;
+
+int consoleThreadFunction() {
 	setlocale(LC_ALL, "rus");
 	system("color 0C");
 	srand(time(0));
 
-	byte systemChoice = NULL;
-	unsigned developerCode = 61027260;
-	unsigned userCode;
 
-	unsigned enemyLaunchCode = 23872;
-	unsigned defenceLaunchCode = 56897;
 
 	cout << "Код входа в режим разработчика:" << endl;
 	cin >> userCode;
@@ -341,18 +401,7 @@ int main() {
 		     По умолчанию будет выбрано 1" << endl;
 	cin >> systemChoice;
 	AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
-	if (systemChoice == 1) {
-		AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
-	}
-	else if (systemChoice == 2) {
-		AirDefenceSystem enemySystem{ C300BM_with_aagm_9M83 };
-	}
-	else if (systemChoice == 3) {
-		// AirDefenceSystem enemySystem = Pac-3_Patriot;
-	}
-	else {
-		AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
-	}
+
 	cout << "Загрузка";
 	Sleep(600);
 	clearRow();
@@ -379,32 +428,50 @@ int main() {
 	AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
 	cin >> systemChoice;
 	defenceSystem.selectType(systemChoice);
-	if (systemChoice == 1) {
-		AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
-	}
-	else if (systemChoice == 2) {
-		AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M83 };
-	}
-	else {
-		AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
-	}
 
 	defenceSystem.setStartPoint();
 	defenceSystem.setTargetPoint();
 
 	double y;
-	for (long i = 0; i < 250000; i+=1000) {
+	for (long i = 0; i < 250000; i += 1000) {
 		y = aagm_9M82.missileMovingEquality(i, 40, g_middle);
 		if (y <= 0) {
 			clearRow;
 			y = aagm_9M82.missileMovingEquality(244050, 40, g_middle);
 			break;
 		}
-		cout << "(" << i/1000 << " km from start; " << y/1000 << " km above the ground)" << endl;
+		cout << "(" << i / 1000 << " km from start; " << y / 1000 << " km above the ground)" << endl;
 	}
 
 
 	Sleep(5000);
 	system("pause");
+
+
 	return 0;
+}
+
+void renderThreadFunction() {
+	//  Connect to the windowing system + create a window
+	//  with the specified dimensions and position
+	//  + set the display mode + specify the window title.
+	glutInit(&argc, argv);
+	centerOnScreen();
+	glutInitWindowSize(window_width, window_height);
+	glutInitWindowPosition(window_x, window_y);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+	glutCreateWindow(window_title);
+
+	//  Set OpenGL program initial state.
+	init();
+
+	// Set the callback functions
+	glutDisplayFunc(display);
+
+	glutMainLoop();
+}
+
+int main() {
+	future<void> renderAsyncFuture = async(launch::async, renderThreadFunction);
+	future<int> consoleAsyncFuture = async(launch::async, consoleThreadFunction);
 }
