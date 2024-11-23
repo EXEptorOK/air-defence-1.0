@@ -3,8 +3,7 @@
 #include <math.h>
 #include <cmath>
 #include <string>
-#include <vector>
-#include <valarray>
+#include <vector>	
 #include <gl/freeglut.h>
 #include <thread>
 #include <future>
@@ -18,6 +17,22 @@ const double g_middle = 9.7056;
 const double g_ground = 9.8066;
 const double g_50km = 9.6542;
 const double PI = 3.1415926535;
+
+unsigned enemyStartX = 0;
+unsigned enemyStartY = 0;
+unsigned enemyTargetX = 0;
+unsigned enemyTargetY = 0;
+uint8_t angle = 45;
+
+byte systemChoice = NULL;
+unsigned developerCode = 61027260;
+unsigned userCode;
+
+unsigned enemyLaunchCode = 23872;
+unsigned defenceLaunchCode = 56897;
+
+double y;
+vector<double> buffer;
 
 int window_x;
 int window_y;
@@ -78,6 +93,7 @@ private:
 	string missileCountry;
 	string missileType;
 	unsigned short missileReleaseDate;
+	uint8_t missileActiveMotionTime = 12;
 
 	// missile's cinematic characteristics/кинематические характеристики ракеты
 	unsigned short missileMass;
@@ -147,15 +163,31 @@ public:
 	double calculateAirResistanceAcceleration(double missileAirResistancePower, unsigned short missileWholeMass) {
 		return missileAirResistancePower / missileWholeMass;
 	}
-	double missileMovingEquality(double x, byte angleDeg, const double g) {
+	double missileMovingEquality(double xShift, double yShift, double x, uint8_t angleDeg) {
 		double angleRad = angleDeg * (PI / 180);
-		double arg1 = tan(angleRad) * x;
-		double arg2 = g + (this->missileAirResistancePower / this->missileWholeMass);
-		double arg3 = 2 * this->missileSpeedMPS * this->missileSpeedMPS * cos(angleRad) * cos(angleRad);
-		double arg4 = x * x;
-		double arg5 = 7080.948308;
-		double yBallistic = arg1 - ((arg2/arg3)*arg4) + arg5;
-		return yBallistic;	
+		double yBallistic;
+		double acceleration = this->missileSpeedMPS / this->missileActiveMotionTime;
+		double activeLength = (acceleration * this->missileActiveMotionTime * this->missileActiveMotionTime) / 2;
+		double activeLengthX = activeLength * cos(angleRad);
+		double activeLengthY = activeLength * sin(angleRad);
+		if (x - xShift < activeLengthX) {
+			yBallistic = (x - xShift) * tan(angleRad) + yShift;
+			return yBallistic;
+		}
+		else if (x >= activeLengthX) {
+			x -= activeLengthX;
+			double arg1 = tan(angleRad) * (x - xShift);
+			double arg2 = g_middle + (this->missileAirResistancePower / this->missileWholeMass);
+			double arg3 = 2 * this->missileSpeedMPS * this->missileSpeedMPS * cos(angleRad) * cos(angleRad);
+			double arg4 = (x - xShift) * (x - xShift);
+			double arg5 = activeLengthY + yShift;
+			yBallistic = arg1 - ((arg2 / arg3) * arg4) + arg5;
+			return yBallistic;
+		}
+	}
+	double calculateMissileTime(uint8_t angleDeg) {
+		double result = (2 * this->missileSpeedMPS * sin(angleDeg * (PI / 180))) / g_middle + 12;
+		return 2 * this->missileSpeedMPS;
 	}
 };
 
@@ -229,26 +261,24 @@ public:
 
 		return { 0 };
 	}
-	void setStartPoint() {
-		vector<unsigned> coords = { 0,0 };
-		system("cls");
-		cout << "Введи координаты пуска [x,y]" << endl;
-		cin >> coords[0];
-		cin >> coords[1];
-		cout << "Данные приняты." << endl;
-		this->startPoint[0] = coords[0];
-		this->startPoint[1] = coords[1];
+	void setStartPoint(double x, double y) {
+		//system("cls");
+		//cout << "Введи координаты пуска [x,y]" << endl;
+		//cin >> enemyStartX;
+		//cin >> enemyStartY;
+		//cout << "Данные приняты." << endl;
+		this->startPoint[0] = x;
+		this->startPoint[1] = y;
 		
 	}
-	void setTargetPoint() {
-		vector<unsigned> coords = { 0,0 };
-		system("cls");
-		cout << "Введи координаты цели [x,y]" << endl;
-		cin >> coords[0];
-		cin >> coords[1];
-		cout << "Данные приняты." << endl;
-		this->startPoint[0] = coords[0];
-		this->startPoint[1] = coords[1];
+	void setTargetPoint(double x, double y) {
+		//system("cls");
+		//cout << "Введи координаты цели [x,y]" << endl;
+		//cin >> coords[0];
+		//cin >> coords[1];
+		//cout << "Данные приняты." << endl;
+		this->startPoint[0] = x;
+		this->startPoint[1] = y;
 	}
 	void selectType(byte choice) {
 		switch (choice) {
@@ -301,7 +331,26 @@ void checkAgreement(uint8_t code) {
 	}
 }
 
-Missile aagm_9M82{ "9M82", "USSR", "anti - aircraft guided missile", 1982, 5800, 150, 5.294f, 22149.7986, 9.913f, 1.215f };
+string humanizeSeconds(int seconds) {
+	string time;
+	if (seconds < 36000) {
+		time += '0';
+	}
+	time += to_string(floor(seconds / 3600));
+	time += ':';
+	if (seconds % 3600 < 600) {
+		time += "0";
+	}
+	time += to_string(floor((seconds % 3600) / 60));
+	time += ":";
+	if ((seconds % 3600) % 60 < 10) {
+		time += '0';
+	}
+	time += to_string(floor((seconds % 3600) % 60));
+	return time;
+}
+
+Missile aagm_9M82{ "9M82", "USSR", "anti - aircraft guided missile", 1982, 5800, 150, 5.294f, 30000.0, 9.913f, 1.215f };
 Missile aagm_9M83{ "9M83", "USSR", "anti - aircraft guided missile", 1983, 3500, 150, 3.529f, 20613.14039/*fix to actual!!!*/, 7.898f, 0.915f};
 Missile aagm_MIM104A{ "MIM-104A", "USA", "anti - aircraft guided missile", 2001, 700, 91, 3.706f,20613.14039/*fix to actual!!!*/, 5.180f, 0.400f};
 
@@ -312,21 +361,26 @@ AirDefenceSystem C300BM_with_aagm_9M83{ "С-300ВМ", "USSR", 1983, 40000, 30000
 AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
 AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
 
-byte systemChoice = NULL;
-unsigned developerCode = 61027260;
-unsigned userCode;
-
-unsigned enemyLaunchCode = 23872;
-unsigned defenceLaunchCode = 56897;
-
-double y;
-
-int consoleThreadFunction() {
+vector<double> consoleThreadFunction() {
 	setlocale(LC_ALL, "rus");
 	system("color 0C");
 	srand(time(0));
-
-
+	unsigned c;
+	cin >> c;
+	cout << humanizeSeconds(c) << endl;
+	unsigned a = 5000;
+	unsigned b = 5000;
+	uint8_t angle = 45;
+	for (long i = a; i < 1000000; i += 1000) {
+		y = aagm_9M82.missileMovingEquality(a, b, i, angle);
+		buffer.push_back(i);
+		buffer.push_back(y);
+		cout << "(" << i / 1000 - a/1000 << " km from start; " << y / 1000 - b/1000 << " km above the ground)";
+		if (y - b < 0) {
+			return buffer;
+		}
+		cout << endl;
+	}
 
 	cout << "Код входа в режим разработчика:" << endl;
 	cin >> userCode;
@@ -400,7 +454,6 @@ int consoleThreadFunction() {
 			 3 - потенциальный противник - ВС США, вооруженные ЗРК PAC-3 \"Patriot\" с ракетой MIM-104A.\
 		     По умолчанию будет выбрано 1" << endl;
 	cin >> systemChoice;
-	AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
 
 	cout << "Загрузка";
 	Sleep(600);
@@ -413,9 +466,8 @@ int consoleThreadFunction() {
 	clearRow();
 	cout << "Загрузка..." << endl;
 	Sleep(1000);
-	cout << "" << endl;
-	enemySystem.setStartPoint();
-	enemySystem.setTargetPoint();
+	enemySystem.setStartPoint(a,b);
+	enemySystem.setTargetPoint(a,b);
 	cout << "Введенные координаты успешно переданы в бортовой компьютер запуска системы. Запомни код пуска: " << enemyLaunchCode << endl;
 	system("pause");
 	clearRow();
@@ -425,30 +477,18 @@ int consoleThreadFunction() {
 	cout << "Выбери тип системы ПВО:\n\t1 - ЗРК\n\t2 - ЗРПК\n\t3 - ПЗРК" << endl;
 	cout << "Будет выбрана система ПВО на базе ЗРК" << endl;
 	cout << "Тип системы ПВО: \n1. С-300ВМ с ракетой 9М82 \n2. С-300ВМ с ракетой 9М83" << endl;
-	AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
+
 	cin >> systemChoice;
 	defenceSystem.selectType(systemChoice);
 
-	defenceSystem.setStartPoint();
-	defenceSystem.setTargetPoint();
-
-	double y;
-	for (long i = 0; i < 250000; i += 1000) {
-		y = aagm_9M82.missileMovingEquality(i, 40, g_middle);
-		if (y <= 0) {
-			clearRow;
-			y = aagm_9M82.missileMovingEquality(244050, 40, g_middle);
-			break;
-		}
-		cout << "(" << i / 1000 << " km from start; " << y / 1000 << " km above the ground)" << endl;
-	}
+	defenceSystem.setStartPoint(a,b);
+	defenceSystem.setTargetPoint(a,b);
 
 
 	Sleep(5000);
 	system("pause");
 
-
-	return 0;
+	return buffer;
 }
 
 void renderThreadFunction() {
@@ -472,6 +512,8 @@ void renderThreadFunction() {
 }
 
 int main() {
+	future<vector<double>> consoleAsyncFuture = async(launch::async, consoleThreadFunction);
+	vector<double> pointMap{ consoleAsyncFuture.get() };
 	future<void> renderAsyncFuture = async(launch::async, renderThreadFunction);
-	future<int> consoleAsyncFuture = async(launch::async, consoleThreadFunction);
+	return 0;
 }
