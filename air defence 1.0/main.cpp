@@ -1,196 +1,14 @@
-﻿#include "Windows.h"
-#include <iostream>
-#include <math.h>
-#include <cmath>
-#include <string>
-#include <vector>	
-#include <gl/freeglut.h>
-#include <thread>
-#include <future>
+﻿#pragma once
+#include "Base.h"
+#include "Constants.h"
+#include "Missile.h"
 
 using namespace std;
 
-byte attackChoose = 1;
-byte defenceChoice = 1;
-
-const double g_middle = 9.7056;
-const double g_ground = 9.8066;
-const double g_50km = 9.6542;
-const double PI = 3.1415926535;
-
-unsigned enemyStartX = 0;
-unsigned enemyStartY = 0;
-unsigned enemyTargetX = 0;
-unsigned enemyTargetY = 0;
-uint8_t angle = 45;
-
-byte systemChoice = NULL;
-unsigned developerCode = 61027260;
-unsigned userCode;
-
-unsigned enemyLaunchCode = 23872;
-unsigned defenceLaunchCode = 56897;
-
-double y;
-vector<double> buffer;
-
-int window_x;
-int window_y;
-
-//  variables representing the window size
-int window_width = 480;
-int window_height = 480;
-
-int argc; 
-char** argv;
-
-const char* window_title = "MISSILE LAUNCHER";
-
-void drawObject()
-{
-	//  Draw Icosahedron
-	glutWireIcosahedron();
-}
-
-void centerOnScreen()
-{
-	window_x = (glutGet(GLUT_SCREEN_WIDTH) - window_width) / 2;
-	window_y = (glutGet(GLUT_SCREEN_HEIGHT) - window_height) / 2;
-}
-void init()
-{
-	//  Set the frame buffer clear color to black.
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-}
-
-//-------------------------------------------------------------------------
-//  This function is passed to glutDisplayFunc in order to display
-//  OpenGL contents on the window.
-//-------------------------------------------------------------------------
-void display(void)
-{
-	//  Clear the window or more specifically the frame buffer...
-	//  This happens by replacing all the contents of the frame
-	//  buffer by the clear color (black in our case)
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	//  Draw object
-	drawObject();
-
-	//  Swap contents of backward and forward frame buffers
-	glutSwapBuffers();
-}
-
-//-------------------------------------------------------------------------
-//  Draws our object.
-//-------------------------------------------------------------------------
-
-class Missile 
-{
-private:
-	// missile's basical information/базовая информация о ракете
-	string missileName;
-	string missileCountry;
-	string missileType;
-	unsigned short missileReleaseDate;
-	uint8_t missileActiveMotionTime = 12;
-
-	// missile's cinematic characteristics/кинематические характеристики ракеты
-	unsigned short missileMass;
-	unsigned short missileWarheadMass;
-	unsigned short missileWholeMass;
-	float missileSpeedMach;
-	unsigned short missileSpeedMPS;
-	double missileAirResistancePower;
-	double missileAirResistanceAcceleration;
-
-	// missile's dimensions/габариты ракеты
-	float missileLengthM;
-	float missileDiameterMM;
-public:
-
-	Missile() {
-
-		// declarative properties
-		this->missileName = "";
-		this->missileCountry = "";
-		this->missileType = "";
-		this->missileReleaseDate = 0;
-		this->missileMass = 0;
-		this->missileWarheadMass = 0;
-		this->missileSpeedMach = 0;
-		this->missileAirResistancePower = 0.0;
-		this->missileLengthM = 0;
-		this->missileDiameterMM = 0;
-
-		// functional properties
-		this->missileSpeedMPS = 0;
-		this->missileWholeMass = 0;
-		this->missileAirResistanceAcceleration = 0.0;
-	}
-
-	Missile (string missileName, string missileCountry, string missileType, unsigned short missileReleaseDate,
-			 unsigned short missileWholeMass, unsigned short missileWarheadMass, float missileSpeedMach,
-			 double missileAirResistancePower, float missileLengthM, 
-		     float missileDiameterMM) {
-
-		// declaration properties
-		this->missileName = missileName;
-		this->missileCountry = missileCountry;
-		this->missileType = missileType;
-		this->missileReleaseDate = missileReleaseDate;
-		this->missileWholeMass = missileWholeMass;
-		this->missileWarheadMass = missileWarheadMass;
-		this->missileSpeedMach = missileSpeedMach;
-		this->missileAirResistancePower = missileAirResistancePower;
-		this->missileLengthM = missileLengthM;
-		this->missileDiameterMM = missileDiameterMM;
-
-		// functional properties
-		this->missileSpeedMPS = MachToMPS(this->missileSpeedMach);
-		this->missileMass = calculateMissileMass(this->missileMass, this->missileWarheadMass);
-		this->missileAirResistanceAcceleration = calculateAirResistanceAcceleration(this->missileAirResistancePower, this->missileWholeMass);
-	}
-
-	unsigned short MachToMPS(float speedMach) {
-		return round(speedMach * 340);
-	}
-
-	unsigned short calculateMissileMass(unsigned short missileWholeMass, unsigned short missileWarheadMass) {
-		return missileWholeMass - missileWarheadMass;
-	}
-
-	double calculateAirResistanceAcceleration(double missileAirResistancePower, unsigned short missileWholeMass) {
-		return missileAirResistancePower / missileWholeMass;
-	}
-	double missileMovingEquality(double xShift, double yShift, double x, uint8_t angleDeg) {
-		double angleRad = angleDeg * (PI / 180);
-		double yBallistic;
-		double acceleration = this->missileSpeedMPS / this->missileActiveMotionTime;
-		double activeLength = (acceleration * this->missileActiveMotionTime * this->missileActiveMotionTime) / 2;
-		double activeLengthX = activeLength * cos(angleRad);
-		double activeLengthY = activeLength * sin(angleRad);
-		if (x - xShift < activeLengthX) {
-			yBallistic = (x - xShift) * tan(angleRad) + yShift;
-			return yBallistic;
-		}
-		else if (x >= activeLengthX) {
-			x -= activeLengthX;
-			double arg1 = tan(angleRad) * (x - xShift);
-			double arg2 = g_middle + (this->missileAirResistancePower / this->missileWholeMass);
-			double arg3 = 2 * this->missileSpeedMPS * this->missileSpeedMPS * cos(angleRad) * cos(angleRad);
-			double arg4 = (x - xShift) * (x - xShift);
-			double arg5 = activeLengthY + yShift;
-			yBallistic = arg1 - ((arg2 / arg3) * arg4) + arg5;
-			return yBallistic;
-		}
-	}
-	double calculateMissileTime(uint8_t angleDeg) {
-		double result = (2 * this->missileSpeedMPS * sin(angleDeg * (PI / 180))) / g_middle + 12;
-		return 2 * this->missileSpeedMPS;
-	}
-};
-
+extern const double g_middle = 9.7056;
+extern const double g_ground = 9.8066;
+extern const double g_50km = 9.6542;
+extern const double PI = 3.1415926535;
 
 class AirDefenceSystem //air defence system / система ПВО
 {
@@ -306,11 +124,11 @@ public:
 //AirDefenceSystem Tunguska{};
 //AirDefenceSystem Tor{};
 
-void clearRow() {
+static void clearRow() {
 	cout << "\r                                                                                            \r";
 }
 
-void checkAgreement(uint8_t code) {
+static void checkAgreement(uint8_t code) {
 	char agreement;
 	cin >> agreement;
 	if (agreement == 'y' || agreement == 'Y') {
@@ -331,22 +149,25 @@ void checkAgreement(uint8_t code) {
 	}
 }
 
-string humanizeSeconds(int seconds) {
+string humanizeSeconds(long seconds) {
 	string time;
 	if (seconds < 36000) {
 		time += '0';
 	}
 	time += to_string(floor(seconds / 3600));
-	time += ':';
+	time += "H:";
 	if (seconds % 3600 < 600) {
-		time += "0";
+		time += '0';
 	}
 	time += to_string(floor((seconds % 3600) / 60));
-	time += ":";
+	time += "M:";
 	if ((seconds % 3600) % 60 < 10) {
 		time += '0';
 	}
-	time += to_string(floor((seconds % 3600) % 60));
+	time += to_string(floor((seconds % 3600) % 60)) + 'S';
+	time.replace(3, 7, "");
+	time.replace(6, 7, "");
+	time.replace(9, 7, "");
 	return time;
 }
 
@@ -361,22 +182,21 @@ AirDefenceSystem C300BM_with_aagm_9M83{ "С-300ВМ", "USSR", 1983, 40000, 30000
 AirDefenceSystem enemySystem{ C300BM_with_aagm_9M82 };
 AirDefenceSystem defenceSystem{ C300BM_with_aagm_9M82 };
 
+unsigned a = 5000;
+unsigned b = 5000;
+uint8_t angle = 45;
+
 vector<double> consoleThreadFunction() {
 	setlocale(LC_ALL, "rus");
 	system("color 0C");
 	srand(time(0));
-	unsigned c;
-	cin >> c;
-	cout << humanizeSeconds(c) << endl;
-	unsigned a = 5000;
-	unsigned b = 5000;
-	uint8_t angle = 45;
 	for (long i = a; i < 1000000; i += 1000) {
 		y = aagm_9M82.missileMovingEquality(a, b, i, angle);
 		buffer.push_back(i);
 		buffer.push_back(y);
 		cout << "(" << i / 1000 - a/1000 << " km from start; " << y / 1000 - b/1000 << " km above the ground)";
 		if (y - b < 0) {
+			cout << "fly time: " << humanizeSeconds(aagm_9M82.calculateMissileTime(45)) << endl;
 			return buffer;
 		}
 		cout << endl;
@@ -491,7 +311,7 @@ vector<double> consoleThreadFunction() {
 	return buffer;
 }
 
-void renderThreadFunction() {
+static void renderThreadFunction() {
 	//  Connect to the windowing system + create a window
 	//  with the specified dimensions and position
 	//  + set the display mode + specify the window title.
@@ -511,9 +331,15 @@ void renderThreadFunction() {
 	glutMainLoop();
 }
 
-int main() {
-	future<vector<double>> consoleAsyncFuture = async(launch::async, consoleThreadFunction);
+future<vector<double>> consoleAsyncFuture;
+static void logout() {
 	vector<double> pointMap{ consoleAsyncFuture.get() };
+	cout << pointMap[345];
+}
+
+int main() {
+	consoleAsyncFuture = async(launch::async, consoleThreadFunction);
 	future<void> renderAsyncFuture = async(launch::async, renderThreadFunction);
+	future<void> logAsyncFuture = async(launch::async, logout);
 	return 0;
 }
