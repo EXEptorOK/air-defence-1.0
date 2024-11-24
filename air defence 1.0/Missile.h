@@ -63,9 +63,9 @@ public:
 	double calculateAirResistanceAcceleration(double missileAirResistancePower, unsigned short missileWholeMass) {
 		return missileAirResistancePower / missileWholeMass;
 	}
-	double missileMovingEquality(double xShift, double yShift, double x, uint8_t angleDeg) {
+	double missileMovingEquality(double xShift, double yShift, double x, uint8_t angleDeg) const {
 		double angleRad = angleDeg * (PI / 180);
-		double yBallistic;
+		double yBallistic = 0.0;
 		double acceleration = this->missileSpeedMPS / this->missileActiveMotionTime;
 		double activeLength = (acceleration * this->missileActiveMotionTime * this->missileActiveMotionTime) / 2;
 		double activeLengthX = activeLength * cos(angleRad);
@@ -74,7 +74,7 @@ public:
 			yBallistic = (x - xShift) * tan(angleRad) + yShift;
 			return yBallistic;
 		}
-		else if (x >= activeLengthX) {
+		else if (x - xShift >= activeLengthX) {
 			x -= activeLengthX;
 			double arg1 = tan(angleRad) * (x - xShift);
 			double arg2 = g_middle + (this->missileAirResistancePower / this->missileWholeMass);
@@ -84,9 +84,14 @@ public:
 			yBallistic = arg1 - ((arg2 / arg3) * arg4) + arg5;
 			return yBallistic;
 		}
+		return yBallistic;
 	}
-	double calculateMissileTime(uint8_t angleDeg) {
+	double calculateMissileTime(uint8_t angleDeg) const {
 		double result = (2 * this->missileSpeedMPS * sin(angleDeg * (PI / 180)) / g_middle) + 12;
 		return result;
 	}
 };
+
+extern Missile aagm_9M82;
+extern Missile aagm_9M83;
+extern Missile aagm_MIM104A;

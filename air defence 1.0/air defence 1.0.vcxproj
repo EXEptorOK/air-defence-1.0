@@ -127,15 +127,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AirDefenceSystem.cpp" />
+    <ClCompile Include="Base.cpp" />
     <ClCompile Include="Base.h" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="consolePreparation.cpp" />
+    <ClCompile Include="Constants.cpp" />
+    <ClCompile Include="main.cpp">
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
+    </ClCompile>
     <ClCompile Include="Missile.cpp" />
     <ClCompile Include="render.cpp" />
+    <ClCompile Include="renderThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AirDefenceSystem.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Missile.h" />
   </ItemGroup>

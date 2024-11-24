@@ -1,37 +1,27 @@
 #pragma once
 #include "Base.h"
 
-const char* window_title = "MISSILE LAUNCHER";
-
-unsigned enemyStartX = 0;
-unsigned enemyStartY = 0;
-unsigned enemyTargetY = 0;
-
-byte systemChoice = NULL;
-unsigned developerCode = 61027260;
-unsigned userCode;
-
-unsigned enemyLaunchCode = 23872;
-unsigned defenceLaunchCode = 56897;
-
-double y;
-std::vector<double> buffer;
-
-int window_x;
-int window_y;
-
-//  variables representing the window size
-int window_width = 480;
-int window_height = 480;
-
-int argc;
-char** argv;
+void reshapeWindow(void) { 
+	glViewport(0, 0, window_width, window_height); 
+	glMatrixMode(GL_PROJECTION); 
+	glLoadIdentity(); 
+	glOrtho(0.0, window_width, 0.0, window_height, -1.0, 1.0);
+	glMatrixMode(GL_MODELVIEW); 
+}
 
 
 void drawObject()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glColor3f(0.0, 1.0, 1.0);
+	glLineWidth(4);
 	//  Draw Icosahedron
-	glutWireIcosahedron();
+	glBegin(GL_LINE_STRIP);
+
+	//glutWireIcosahedron();
+	drawTrajectory(makeBuffer(5000, 5000, 45));
+	glEnd();
+	glFlush();
 }
 
 void centerOnScreen()
@@ -49,20 +39,22 @@ void init()
 //  This function is passed to glutDisplayFunc in order to display
 //  OpenGL contents on the window.
 //-------------------------------------------------------------------------
-void display()
+void display(void)
 {
-	//  Clear the window or more specifically the frame buffer...
-	//  This happens by replacing all the contents of the frame
-	//  buffer by the clear color (black in our case)
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	//  Draw object
 	drawObject();
 
-	//  Swap contents of backward and forward frame buffers
 	glutSwapBuffers();
+	//  Swap contents of backward and forward frame buffers
 }
 
 //-------------------------------------------------------------------------
 //  Draws our object.
 //-------------------------------------------------------------------------
+
+void drawTrajectory(std::vector<double> buffer) {
+	for (unsigned i = 0; i < buffer.size()-1; i+=2) {
+		glVertex2d(buffer[i], buffer[i+1]);
+		//std::cout << "Vertex: " << i << std::endl;
+	}
+	//std::cout << "Buffer done!" << std::endl;
+}
