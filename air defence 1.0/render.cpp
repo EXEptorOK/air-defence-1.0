@@ -15,12 +15,12 @@ void drawObject()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(0.0, 1.0, 1.0);
 	glLineWidth(4);
-	//  Draw Icosahedron
 	glBegin(GL_LINE_STRIP);
-
+	//  Draw Icosahedron
+	//glBegin(GL_LINE_STRIP);
+	drawTrajectory();
 	//glutWireIcosahedron();
-	drawTrajectory(makeBuffer(5000, 5000, 45));
-	glEnd();
+	//glEnd();
 	glFlush();
 }
 
@@ -47,14 +47,16 @@ void display(void)
 	//  Swap contents of backward and forward frame buffers
 }
 
+void drawTrajectory() {
+	for (unsigned i = 0; i < pointMap.size() - 1; i += 1) {
+		std::cout << pointMap[i] << "  , " << pointMap[i + 1] << std::endl;
+		glVertex2d(pointMap[i], pointMap[i + 1]);
+		glEnd();
+		Sleep(150);
+		glFlush();
+		//std::cout << "Vertex: " << i << std::endl;
+	}
+}
 //-------------------------------------------------------------------------
 //  Draws our object.
 //-------------------------------------------------------------------------
-
-void drawTrajectory(std::vector<double> buffer) {
-	for (unsigned i = 0; i < buffer.size()-1; i+=2) {
-		glVertex2d(buffer[i], buffer[i+1]);
-		//std::cout << "Vertex: " << i << std::endl;
-	}
-	//std::cout << "Buffer done!" << std::endl;
-}

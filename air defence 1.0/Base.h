@@ -35,6 +35,8 @@ extern int window_y;
 //  variables representing the window size
 extern int window_width;
 extern int window_height;
+extern std::vector<double> pointMap;
+extern std::future<std::vector<double>> makeBufferFuture;
 
 extern int argc;
 extern char** argv;
@@ -45,11 +47,12 @@ extern void init();
 extern void display(void);
 extern void renderThreadFunction();
 extern void reshapeWindow(void);
-extern void drawTrajectory(std::vector<double> buffer);
+void drawTrajectory();
 
 extern void consolePreparation(void);
 extern void clearRow(void);
 extern void checkAgreement(uint8_t code);
+extern void logout(void);
 
 std::string humanizeSeconds(long seconds);
 

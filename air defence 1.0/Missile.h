@@ -12,7 +12,7 @@ private:
 	std::string missileCountry;
 	std::string missileType;
 	unsigned short missileReleaseDate;
-	uint8_t missileActiveMotionTime = 12;
+	float missileActiveMotionTime = 12.0;
 
 	// missile's cinematic characteristics/кинематические характеристики ракеты
 	unsigned short missileMass;

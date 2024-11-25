@@ -1,3 +1,4 @@
+#pragma once
 #define PI dev_pi_number
 #include "Constants.h"
 

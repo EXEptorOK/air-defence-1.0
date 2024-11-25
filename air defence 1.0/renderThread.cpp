@@ -1,4 +1,6 @@
+#pragma once
 #include "Base.h"
+
 
 void renderThreadFunction() {
 	//  Connect to the windowing system + create a window

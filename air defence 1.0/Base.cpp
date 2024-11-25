@@ -27,9 +27,11 @@ int window_y;
 //  variables representing the window size
 int window_width = 600;
 int window_height = 400;
+std::vector<double> pointMap = makeBuffer(5000, 5000, 45);
 
 int argc;
 char** argv;
+std::future<std::vector<double>> makeBufferFuture;
 
 void clearRow() {
 	cout << "\r                                                                                            \r";
@@ -54,6 +56,12 @@ void checkAgreement(uint8_t code) {
 		cout << "Type the answer correctly!!!" << endl;
 		checkAgreement(code);
 	}
+}
+
+void logout() {
+	pointMap.clear();
+	pointMap = { makeBufferFuture.get() };
+	cout << pointMap[345] << endl;
 }
 
 string humanizeSeconds(long seconds) {

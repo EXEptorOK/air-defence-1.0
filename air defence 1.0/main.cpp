@@ -71,17 +71,9 @@ void consoleThreadFunction() {
 	//return buffer;
 }
 
-future<vector<double>> makeBufferFuture;
-
-static void logout() {
-	vector<double> pointMap{ makeBufferFuture.get() };
-	cout << pointMap[345] << endl;
-}
-
 int main() {
 	future<void> renderAsyncFuture = async(launch::async, renderThreadFunction);
 	makeBufferFuture = async(launch::async, makeBuffer , 5000, 5000, 45);
 	future<void> consoleAsyncFuture = async(launch::async, consoleThreadFunction);
-	future<void> logAsyncFuture = async(launch::async, logout);
 	return 0;
 }
