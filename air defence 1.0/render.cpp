@@ -12,15 +12,8 @@ void reshapeWindow(void) {
 
 void drawObject()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColor3f(0.0, 1.0, 1.0);
 	glLineWidth(4);
-	glBegin(GL_LINE_STRIP);
-	//  Draw Icosahedron
-	//glBegin(GL_LINE_STRIP);
 	drawTrajectory();
-	//glutWireIcosahedron();
-	//glEnd();
 	glFlush();
 }
 
@@ -48,14 +41,17 @@ void display(void)
 }
 
 void drawTrajectory() {
-	for (unsigned i = 0; i < pointMap.size() - 1; i += 1) {
-		std::cout << pointMap[i] << "  , " << pointMap[i + 1] << std::endl;
-		glVertex2d(pointMap[i], pointMap[i + 1]);
-		glEnd();
-		Sleep(150);
-		glFlush();
-		//std::cout << "Vertex: " << i << std::endl;
+	glBegin(GL_LINES);
+	glVertex2d(pointMap[counter], pointMap[counter + 1]);
+	glVertex2d(pointMap[counter+2], pointMap[counter + 3]);
+	glEnd();
+	//std::cout << "Vertex: " << i << std::endl;
+	counter += 4;
+	if (counter >= pointMap.size() - 5) {
+		counter = 0;
+		return;
 	}
+	Sleep(70);
 }
 //-------------------------------------------------------------------------
 //  Draws our object.

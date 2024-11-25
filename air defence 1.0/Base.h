@@ -31,12 +31,13 @@ extern double y;
 
 extern int window_x;
 extern int window_y;
+extern unsigned counter;
 
 //  variables representing the window size
 extern int window_width;
 extern int window_height;
 extern std::vector<double> pointMap;
-extern std::future<std::vector<double>> makeBufferFuture;
+extern std::future<int> makeBufferFuture;
 
 extern int argc;
 extern char** argv;
@@ -56,4 +57,4 @@ extern void logout(void);
 
 std::string humanizeSeconds(long seconds);
 
-std::vector<double> makeBuffer(unsigned a, unsigned b, uint8_t angle);
+int makeBuffer(unsigned a, unsigned b, uint8_t angle);

@@ -72,8 +72,8 @@ void consoleThreadFunction() {
 }
 
 int main() {
+	makeBufferFuture = async(launch::async, makeBuffer , 5000, 20000, 45);
 	future<void> renderAsyncFuture = async(launch::async, renderThreadFunction);
-	makeBufferFuture = async(launch::async, makeBuffer , 5000, 5000, 45);
 	future<void> consoleAsyncFuture = async(launch::async, consoleThreadFunction);
 	return 0;
 }

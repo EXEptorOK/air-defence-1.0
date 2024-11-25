@@ -27,11 +27,12 @@ int window_y;
 //  variables representing the window size
 int window_width = 600;
 int window_height = 400;
-std::vector<double> pointMap = makeBuffer(5000, 5000, 45);
+std::vector<double> pointMap;
 
 int argc;
 char** argv;
-std::future<std::vector<double>> makeBufferFuture;
+unsigned counter = 0;
+std::future<int> makeBufferFuture;
 
 void clearRow() {
 	cout << "\r                                                                                            \r";
@@ -59,8 +60,7 @@ void checkAgreement(uint8_t code) {
 }
 
 void logout() {
-	pointMap.clear();
-	pointMap = { makeBufferFuture.get() };
+	makeBufferFuture.get();
 	cout << pointMap[345] << endl;
 }
 
@@ -86,15 +86,14 @@ string humanizeSeconds(long seconds) {
 	return time;
 }
 
-vector<double> makeBuffer(unsigned a, unsigned b, uint8_t angle) {
-	vector<double> buffer;
+int makeBuffer(unsigned a, unsigned b, uint8_t angle) {
 	for (long i = a; i < 2000000; i += 1000) {
 		y = aagm_9M82.missileMovingEquality(a, b, i, angle);
-		buffer.push_back(i/410);
-		buffer.push_back(y/410);
-		if (y - b < 0) {
-			return buffer;
+		pointMap.push_back(i/450);
+		pointMap.push_back(y/450);
+		if (y < 0) {
+			return 0;
 		}
 	}
-	return buffer;
+	return 0;
 }

@@ -24,12 +24,20 @@ void renderThreadFunction() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW);
-	glOrtho(0.0, window_width, 0.0, window_height, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glOrtho(0.0, window_width, 0.0, window_height, 0.0, 1000.0);
+	glColor3f(0.0, 1.0, 1.0);
 	//glutFullScreen();
 	//std::cout << "Reshaped succesfully!" << std::endl;
 	//glutReshapeFunc(reshapeWindow());
 	//std::cout << "Screen cleaned succesfully!" << std::endl;
 	glutDisplayFunc(display);
+	glutIdleFunc(display);
+	/*glutReshapeFunc([](int window_width,int window_height) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glOrtho(0.0, window_width, 0.0, window_height, 0.0, 1000.0);
+		glColor3f(0.0, 1.0, 1.0);
+		});*/
 	//std::cout << "Line done!" << std::endl;
 	glutMainLoop();
 }
