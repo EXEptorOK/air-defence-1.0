@@ -63,26 +63,43 @@ public:
 	double calculateAirResistanceAcceleration(double missileAirResistancePower, unsigned short missileWholeMass) {
 		return missileAirResistancePower / missileWholeMass;
 	}
-	double missileMovingEquality(double xShift, double yShift, double x, uint8_t angleDeg) const {
+	double missileMovingEquality(double xShift, double yShift, double x, uint8_t angleDeg, 
+								 double marchAccelerationApplyPointX, unsigned short timeS, double marchAccelerationX, double marchAccelerationY) const {
 		double angleRad = angleDeg * (PI / 180);
 		double yBallistic = 0.0;
-		double acceleration = this->missileSpeedMPS / this->missileActiveMotionTime;
-		double activeLength = (acceleration * this->missileActiveMotionTime * this->missileActiveMotionTime) / 2;
-		double activeLengthX = activeLength * cos(angleRad);
-		double activeLengthY = activeLength * sin(angleRad);
-		if (x - xShift < activeLengthX) {
+		double startAcceleration = this->missileSpeedMPS / this->missileActiveMotionTime;
+		double startLength = (startAcceleration * this->missileActiveMotionTime * this->missileActiveMotionTime) / 2;
+		double startLengthX = startLength * cos(angleRad);
+		double startLengthY = startLength * sin(angleRad);
+		double maxHeight = (((this->missileSpeedMPS * this->missileSpeedMPS) * (sin(angleRad) * sin(angleRad)))
+							/ (g_middle + (this->missileAirResistancePower / this->missileWholeMass))) + yShift;
+		double accelerationLength = 0.0;
+		if (tan(angleRad) - ((((g_middle + (this->missileAirResistancePower / this->missileWholeMass))
+			/ (2 * this->missileSpeedMPS * this->missileSpeedMPS) * cos(angleRad) * cos(angleRad))) * (x - xShift)) > 0) {
+
+		}
+		else if (tan(angleRad) - ((((g_middle + (this->missileAirResistancePower / this->missileWholeMass))
+					/ (2 * this->missileSpeedMPS * this->missileSpeedMPS) * cos(angleRad) * cos(angleRad) ) ) * (x - xShift)) < 0) {
+
+		}
+		if (x - xShift < startLengthX) {
 			yBallistic = (x - xShift) * tan(angleRad) + yShift;
 			return yBallistic;
 		}
-		else if (x - xShift >= activeLengthX) {
-			x -= activeLengthX;
+		else if (x - xShift >= startLengthX) {
+			x -= startLengthX;
 			double arg1 = tan(angleRad) * (x - xShift);
 			double arg2 = g_middle + (this->missileAirResistancePower / this->missileWholeMass);
 			double arg3 = 2 * this->missileSpeedMPS * this->missileSpeedMPS * cos(angleRad) * cos(angleRad);
 			double arg4 = (x - xShift) * (x - xShift);
-			double arg5 = activeLengthY + yShift;
+			double arg5 = startLengthY + yShift;
 			yBallistic = arg1 - ((arg2 / arg3) * arg4) + arg5;
 			return yBallistic;
+		}
+		if (timeS >= 0 && marchAccelerationX != 0 && marchAccelerationY != 0) {
+			if (x >= marchAccelerationApplyPointX) {
+				yBallistic =
+			}
 		}
 		return yBallistic;
 	}
