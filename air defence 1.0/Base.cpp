@@ -34,6 +34,8 @@ char** argv;
 unsigned counter = 0;
 std::future<int> makeBufferFuture;
 
+
+
 void clearRow() {
 	cout << "\r                                                                                            \r";
 }
