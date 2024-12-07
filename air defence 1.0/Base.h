@@ -28,6 +28,7 @@ extern unsigned enemyLaunchCode;
 extern unsigned defenceLaunchCode;
 
 extern double y;
+extern double missileX;
 
 extern int window_x;
 extern int window_y;

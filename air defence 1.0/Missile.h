@@ -65,7 +65,9 @@ public:
 	}
 	double missileMovingEquality(double xShift, double yShift, double x, uint8_t angleDeg, 
 								 double marchAccelerationApplyPointX, unsigned short timeS, double marchAccelerationX, double marchAccelerationY) const {
+		
 		char missileState = 'u'; // u - up, d - down
+		missileX = x;
 		double speed = 0;
 		double accelerationAngleRad = atan(marchAccelerationY / marchAccelerationX);
 		double angleRad = angleDeg * (PI / 180);
@@ -86,6 +88,7 @@ public:
 			missileState = 'd';
 		}
 		if (x - xShift < startLengthX) {
+			missileX = x;
 			yBallistic = (x - xShift) * tan(angleRad) + yShift;
 			return yBallistic;
 		}
@@ -98,11 +101,13 @@ public:
 		if (timeS >= 0 && marchAccelerationX != 0 && marchAccelerationY != 0) {
 			if (x >= marchAccelerationApplyPointX && x <= marchAccelerationApplyPointX + (speed * timeS) + 
 				(sqrt((marchAccelerationY * marchAccelerationY + marchAccelerationX * marchAccelerationX)) * timeS * timeS) / 2) {
+				missileX = x;
 				yBallistic = arg1 - (((arg2 - marchAccelerationY) / arg3) * arg4) + arg5;
 				return yBallistic;
 			}
 		}
 		if (x - xShift >= startLengthX) {
+			missileX = x;
 			yBallistic = arg1 - ((arg2 / arg3) * arg4) + arg5;
 			return yBallistic;
 		}

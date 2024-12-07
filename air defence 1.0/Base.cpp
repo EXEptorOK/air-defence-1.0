@@ -20,6 +20,7 @@ unsigned enemyLaunchCode = 23872;
 unsigned defenceLaunchCode = 56897;
 
 double y;
+double missileX = 0;
 
 int window_x;
 int window_y;
@@ -90,7 +91,7 @@ string humanizeSeconds(long seconds) {
 
 int makeBuffer(unsigned a, unsigned b, uint8_t angle) {
 	for (long i = a; i < 2000000; i += 1000) {
-		y = aagm_9M82.missileMovingEquality(a, b, i, angle);
+		y = aagm_9M82.missileMovingEquality(a, b, i, angle, 150000, 20, 50, 20);
 		pointMap.push_back(i/450);
 		pointMap.push_back(y/450);
 		if (y < 0) {

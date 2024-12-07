@@ -136,6 +136,7 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="Missile.cpp" />
+    <ClCompile Include="network.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="renderThread.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="AirDefenceSystem.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Missile.h" />
+    <ClInclude Include="network.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
