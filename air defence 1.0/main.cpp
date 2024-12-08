@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "network.h"
 #include "Base.h"
 #include "Constants.h"
 #include "Missile.h"
@@ -73,6 +74,7 @@ void consoleThreadFunction() {
 
 int main() {
 	makeBufferFuture = async(launch::async, makeBuffer , 5000, 20000, 45);
+	future<int> networkingFuture = async(launch::async, web);
 	future<void> renderAsyncFuture = async(launch::async, renderThreadFunction);
 	future<void> consoleAsyncFuture = async(launch::async, consoleThreadFunction);
 	return 0;

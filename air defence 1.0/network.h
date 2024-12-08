@@ -1,11 +1,14 @@
 #pragma once
+#include <winsock2.h>
+#include <WS2tcpip.h>
 #include "Base.h"
-#include "winsock2.h"
-#pragma comment(lib, "wsock32.lib")
-#include <sys/types.h>
+#include <http.h>
+#include <locale>
 
-WSADATA ws;
-SOCKET trackSocket;
+int web();
+
+
+
 
 
 

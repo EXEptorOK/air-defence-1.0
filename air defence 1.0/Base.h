@@ -2,15 +2,21 @@
 #define PI dev_pi_number
 
 #include "Windows.h"
-#include <vector>
 #include <gl/freeglut.h>
-#include <string>
-
 #include <math.h>
+#include <stdio.h>
+
+#include <string>
+#include <vector>
 #include <iostream>
 #include <cmath>
 #include <thread>
 #include <future>
+
+#pragma comment(lib, "httpapi.lib")
+#pragma comment(lib, "ws2_32.lib")
+
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 extern const char* window_title;
 
