@@ -7,12 +7,11 @@ int web()
     int nDataLength;
     std::string website_HTML;
 
-    std::string url = "http://localhost:3000";
+    std::string url = "localhost:3000";
 
     std::string get_http = "GET / HTTP/1.1\r\nHost: " + url + "\r\nConnection: close\r\n\r\n";
 
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData))
-    {
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
         return 0;
     }
 
