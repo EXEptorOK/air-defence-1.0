@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\\curl\curl-8.11.1\builds\libcurl-vc15-x64-debug-static-ipv6-sspi-schannel\include;$(ExternalIncludePath)</ExternalIncludePath>
-    <LibraryPath>${curl-dir}\builds\libcurl-vc15-x64-release-static-ipv6-sspi-schannel\lib;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\\curl\curl-8.11.1\builds\libcurl-vc15-x64-debug-static-ipv6-sspi-schannel\include;C:\\curl\curl-8.11.1\builds\libcurl-vc15-x64-release-static-ipv6-sspi-schannel\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>${curl-dir}\builds\libcurl-vc15-x64-release-static-ipv6-sspi-schannel\lib;${curl-dir}\builds\libcurl-vc15-x64-debug-static-ipv6-sspi-schannel\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -112,7 +112,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>C:\\curl\curl-8.11.1\builds\libcurl-vc15-x64-debug-static-ipv6-sspi-schannel\lib\libcurl_a_debug.lib;C:\\curl\curl-8.11.1\builds\libcurl-vc15-x64-release-static-ipv6-sspi-schannel\lib\libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\curl\curl-8.11.1\builds\libcurl-vc15-x64-debug-static-ipv6-sspi-schannel\lib\libcurl_a_debug.lib;C:\curl\curl-8.11.1\builds\libcurl-vc15-x64-release-static-ipv6-sspi-schannel\lib\libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;libcmtd.lib;msvcrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
