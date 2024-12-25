@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\razog\source\repos\air-defence-1.0\app\build\CMakeFiles\4ee72c74be772fa80a51aac018782a92\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{64B65747-A794-3851-9D0C-055F60EB4C41}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

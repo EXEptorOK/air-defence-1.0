@@ -1,0 +1,3 @@
+C:/Users/razog/source/repos/air-defence-1.0/app/build/CMakeFiles/main.dir
+C:/Users/razog/source/repos/air-defence-1.0/app/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/razog/source/repos/air-defence-1.0/app/build/CMakeFiles/ZERO_CHECK.dir
